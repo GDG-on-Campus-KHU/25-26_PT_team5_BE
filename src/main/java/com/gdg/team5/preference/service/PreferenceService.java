@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +37,17 @@ public class PreferenceService {
                 .user(user)
                 .preference(preference)
                 .build();
+            userPreferenceRepository.save(userPreference);
         }
+    }
+
+    public List<Preference> getPreference(Long userId) {
+        List<UserPreference> userPreferences = userPreferenceRepository.findByUserId(userId);
+        if (userPreferences.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.PREFERENCE_USER_NOT_FOUND);
+        }
+        return userPreferences.stream()
+            .map(UserPreference::getPreference)
+            .collect(Collectors.toList());
     }
 }
