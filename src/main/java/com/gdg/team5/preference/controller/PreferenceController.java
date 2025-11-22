@@ -32,4 +32,9 @@ public class PreferenceController {
     public BaseResponse<List<Preference>> getPreference(@PathVariable Long userId) {
         return new BaseResponse<>(preferenceService.getPreference(userId));
     }
+
+    @GetMapping("")
+    public BaseResponse<List<Preference>> getAllPreference() {
+        return new BaseResponse<>(preferenceService.getAllPreference());
+    }
 }

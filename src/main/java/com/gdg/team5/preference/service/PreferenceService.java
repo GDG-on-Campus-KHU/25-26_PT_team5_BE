@@ -69,4 +69,8 @@ public class PreferenceService {
             .map(UserPreference::getPreference)
             .collect(Collectors.toList());
     }
+
+    public List<Preference> getAllPreference() {
+        return preferenceRepository.findAll();
+    }
 }
