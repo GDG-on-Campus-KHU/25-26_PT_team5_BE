@@ -2,16 +2,14 @@ package com.gdg.team5.preference.domain;
 
 import com.gdg.team5.auth.domain.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserPreference {
 
     @Id
@@ -27,15 +25,9 @@ public class UserPreference {
     @JoinColumn(name = "preferenceId")
     private Preference preference;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUser(User user) {
+    @Builder
+    public UserPreference(User user, Preference preference) {
         this.user = user;
-    }
-
-    public void setPreference(Preference preference) {
         this.preference = preference;
     }
 }
