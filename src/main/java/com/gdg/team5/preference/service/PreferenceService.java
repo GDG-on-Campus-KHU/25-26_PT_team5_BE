@@ -25,12 +25,13 @@ public class PreferenceService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void savePreference(PreferenceRequestDto requestDto) {
+    public void updatePreference(PreferenceRequestDto requestDto) {
         // 임시 유저 객체
         User user = User.builder()
             .id(1L)
             .build();
 
+        userPreferenceRepository.deleteByUserId(user.getId());
         List<Long> preferenceIds = requestDto.getPreferenceIds();
         for (Long preferenceId : preferenceIds) {
             Preference preference = preferenceRepository.findById(preferenceId)
@@ -43,25 +44,13 @@ public class PreferenceService {
         }
     }
 
-    @Transactional
-    public void updatePreference(Long userId, PreferenceRequestDto requestDto) {
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new BaseException(BaseResponseStatus.PREFERENCE_NOT_FOUND));
-        userPreferenceRepository.deleteByUserId(userId);
-        List<Long> preferenceIds = requestDto.getPreferenceIds();
-        for (Long preferenceId : preferenceIds) {
-            Preference preference = preferenceRepository.findById(preferenceId)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.PREFERENCE_NOT_FOUND));
-            UserPreference userPreference = UserPreference.builder()
-                .user(user)
-                .preference(preference)
-                .build();
-            userPreferenceRepository.save(userPreference);
-        }
-    }
+    public List<Preference> getPreference() {
+        // 임시 유저 객체
+        User user = User.builder()
+            .id(1L)
+            .build();
 
-    public List<Preference> getPreference(Long userId) {
-        List<UserPreference> userPreferences = userPreferenceRepository.findByUserId(userId);
+        List<UserPreference> userPreferences = userPreferenceRepository.findByUserId(user.getId());
         if (userPreferences.isEmpty()) {
             throw new BaseException(BaseResponseStatus.PREFERENCE_USER_NOT_FOUND);
         }

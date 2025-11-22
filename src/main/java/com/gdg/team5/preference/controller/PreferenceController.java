@@ -16,24 +16,18 @@ public class PreferenceController {
 
     private final PreferenceService preferenceService;
 
-    @PostMapping("")
-    public BaseResponse<String> savePreference(@RequestBody PreferenceRequestDto requestDto) {
-        preferenceService.savePreference(requestDto);
+    @PatchMapping("")
+    public BaseResponse<String> updatePreference(@RequestBody PreferenceRequestDto requestDto) {
+        preferenceService.updatePreference(requestDto);
         return new BaseResponse<>("관심 분야 저장 성공");
     }
 
-    @PatchMapping("/{userId}")
-    public BaseResponse<String> updatePreference(@PathVariable Long userId, @RequestBody PreferenceRequestDto requestDto) {
-        preferenceService.updatePreference(userId, requestDto);
-        return new BaseResponse<>("관심 분야 수정 성공");
-    }
-
-    @GetMapping("/{userId}")
-    public BaseResponse<List<Preference>> getPreference(@PathVariable Long userId) {
-        return new BaseResponse<>(preferenceService.getPreference(userId));
-    }
-
     @GetMapping("")
+    public BaseResponse<List<Preference>> getPreference() {
+        return new BaseResponse<>(preferenceService.getPreference());
+    }
+
+    @GetMapping("/all")
     public BaseResponse<List<Preference>> getAllPreference() {
         return new BaseResponse<>(preferenceService.getAllPreference());
     }
