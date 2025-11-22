@@ -1,6 +1,7 @@
 package com.gdg.team5.preference.service;
 
 import com.gdg.team5.auth.domain.User;
+import com.gdg.team5.auth.repository.UserRepository;
 import com.gdg.team5.common.exception.BaseException;
 import com.gdg.team5.common.response.BaseResponseStatus;
 import com.gdg.team5.preference.domain.Preference;
@@ -21,6 +22,7 @@ public class PreferenceService {
 
     private final UserPreferenceRepository userPreferenceRepository;
     private final PreferenceRepository preferenceRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public void savePreference(PreferenceRequestDto requestDto) {
@@ -29,6 +31,23 @@ public class PreferenceService {
             .id(1L)
             .build();
 
+        List<Long> preferenceIds = requestDto.getPreferenceIds();
+        for (Long preferenceId : preferenceIds) {
+            Preference preference = preferenceRepository.findById(preferenceId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.PREFERENCE_NOT_FOUND));
+            UserPreference userPreference = UserPreference.builder()
+                .user(user)
+                .preference(preference)
+                .build();
+            userPreferenceRepository.save(userPreference);
+        }
+    }
+
+    @Transactional
+    public void updatePreference(Long userId, PreferenceRequestDto requestDto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.PREFERENCE_NOT_FOUND));
+        userPreferenceRepository.deleteByUserId(userId);
         List<Long> preferenceIds = requestDto.getPreferenceIds();
         for (Long preferenceId : preferenceIds) {
             Preference preference = preferenceRepository.findById(preferenceId)

@@ -8,6 +8,9 @@ public enum BaseResponseStatus {
     // 성공
     SUCCESS(true, HttpStatus.OK.value(), "요청에 성공하였습니다."),
 
+    // 유저 관련 에러
+    USER_NOT_FOUND(false, HttpStatus.BAD_REQUEST.value(), "유저를 찾을 수 없습니다."),
+
     // 관심 관련 에러
     PREFERENCE_NOT_FOUND(false, HttpStatus.BAD_REQUEST.value(), "관심을 찾을 수 없습니다."),
     PREFERENCE_USER_NOT_FOUND(false, HttpStatus.BAD_REQUEST.value(), "해당 유저의 관심 정보를 찾을 수 없습니다."),

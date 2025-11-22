@@ -22,6 +22,12 @@ public class PreferenceController {
         return new BaseResponse<>("관심 분야 저장 성공");
     }
 
+    @PatchMapping("/{userId}")
+    public BaseResponse<String> updatePreference(@PathVariable Long userId, @RequestBody PreferenceRequestDto requestDto) {
+        preferenceService.updatePreference(userId, requestDto);
+        return new BaseResponse<>("관심 분야 수정 성공");
+    }
+
     @GetMapping("/{userId}")
     public BaseResponse<List<Preference>> getPreference(@PathVariable Long userId) {
         return new BaseResponse<>(preferenceService.getPreference(userId));
