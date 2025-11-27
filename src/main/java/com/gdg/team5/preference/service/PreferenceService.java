@@ -33,7 +33,7 @@ public class PreferenceService {
             .build();
 
         userPreferenceRepository.deleteByUserId(user.getId());
-        List<Long> preferenceIds = requestDto.getPreferenceIds();
+        List<Long> preferenceIds = requestDto.preferenceIds();
         for (Long preferenceId : preferenceIds) {
             Preference preference = preferenceRepository.findById(preferenceId)
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.PREFERENCE_NOT_FOUND));
