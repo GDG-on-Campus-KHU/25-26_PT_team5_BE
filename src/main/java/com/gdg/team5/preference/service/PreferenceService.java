@@ -33,18 +33,17 @@ public class PreferenceService {
 
         userPreferenceRepository.deleteByUserId(user.getId());
         List<Long> preferenceIds = requestDto.preferenceIds();
-        for (Long preferenceId : preferenceIds) {
-            Preference preference = preferenceRepository.findById(preferenceId)
-                .orElseThrow(() -> new BaseException(BaseResponseStatus.PREFERENCE_NOT_FOUND));
-            UserPreference userPreference = UserPreference.builder()
+        List<Preference> preferences = preferenceRepository.findAllById(preferenceIds);
+        List<UserPreference> newPreferences = preferences.stream()
+            .map(preference -> UserPreference.builder()
                 .user(user)
                 .preference(preference)
-                .build();
-            userPreferenceRepository.save(userPreference);
-        }
+                .build())
+            .collect(Collectors.toList());
+        userPreferenceRepository.saveAll(newPreferences);
     }
 
-    public List<Preference> getPreference() {
+    public List<PreferenceResponseDto> getPreference() {
         // 임시 유저 객체
         User user = User.builder()
             .id(1L)

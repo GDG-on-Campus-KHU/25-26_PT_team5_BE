@@ -11,7 +11,9 @@ import java.util.List;
 
 @Repository
 public interface UserPreferenceRepository extends JpaRepository<UserPreference, Long> {
-    List<UserPreference> findByUserId(Long userId);
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM UserPreference up WHERE up.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long id);
 
     @Query("SELECT up FROM UserPreference up JOIN FETCH up.preference WHERE up.user.id = :userId")
     List<UserPreference> findAllByUserIdWithPreference(@Param("userId") Long userId);
