@@ -2,11 +2,10 @@ package com.gdg.team5.preference.service;
 
 import com.gdg.team5.auth.domain.User;
 import com.gdg.team5.auth.repository.UserRepository;
-import com.gdg.team5.common.exception.BaseException;
-import com.gdg.team5.common.response.BaseResponseStatus;
 import com.gdg.team5.preference.domain.Preference;
 import com.gdg.team5.preference.domain.UserPreference;
 import com.gdg.team5.preference.dto.PreferenceRequestDto;
+import com.gdg.team5.preference.dto.PreferenceResponseDto;
 import com.gdg.team5.preference.repository.PreferenceRepository;
 import com.gdg.team5.preference.repository.UserPreferenceRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,16 +50,26 @@ public class PreferenceService {
             .id(1L)
             .build();
 
-        List<UserPreference> userPreferences = userPreferenceRepository.findByUserId(user.getId());
+        List<UserPreference> userPreferences = userPreferenceRepository.findAllByUserIdWithPreference(user.getId());
         if (userPreferences.isEmpty()) {
-            throw new BaseException(BaseResponseStatus.PREFERENCE_USER_NOT_FOUND);
+            return List.of();
         }
         return userPreferences.stream()
-            .map(UserPreference::getPreference)
+            .map(userPreference -> new PreferenceResponseDto(
+                userPreference.getPreference().getId(),
+                userPreference.getPreference().getKeyword(),
+                userPreference.getPreference().getType()
+            ))
             .collect(Collectors.toList());
     }
 
-    public List<Preference> getAllPreference() {
-        return preferenceRepository.findAll();
+    public List<PreferenceResponseDto> getAllPreference() {
+        return preferenceRepository.findAll().stream()
+            .map(preference -> new PreferenceResponseDto(
+                preference.getId(),
+                preference.getKeyword(),
+                preference.getType()
+            ))
+            .collect(Collectors.toList());
     }
 }

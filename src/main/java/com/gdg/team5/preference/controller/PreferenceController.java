@@ -1,8 +1,8 @@
 package com.gdg.team5.preference.controller;
 
 import com.gdg.team5.common.response.BaseResponse;
-import com.gdg.team5.preference.domain.Preference;
 import com.gdg.team5.preference.dto.PreferenceRequestDto;
+import com.gdg.team5.preference.dto.PreferenceResponseDto;
 import com.gdg.team5.preference.service.PreferenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,12 +23,12 @@ public class PreferenceController {
     }
 
     @GetMapping("")
-    public BaseResponse<List<Preference>> getPreference() {
+    public BaseResponse<List<PreferenceResponseDto>> getPreference() {
         return new BaseResponse<>(preferenceService.getPreference());
     }
 
     @GetMapping("/all")
-    public BaseResponse<List<Preference>> getAllPreference() {
+    public BaseResponse<List<PreferenceResponseDto>> getAllPreference() {
         return new BaseResponse<>(preferenceService.getAllPreference());
     }
 }
