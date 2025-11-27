@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Table(name = "users")
 @Entity
 @Getter
 @NoArgsConstructor
@@ -41,6 +42,12 @@ public class User extends BaseTimeEntity {
     }
 
     public void setName(String name) {
+        this.name = name;
+    }
+
+    public User(String email, String password, String name) {
+        this.email = email;
+        this.password = password;
         this.name = name;
     }
 }
