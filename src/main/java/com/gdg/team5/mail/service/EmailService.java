@@ -1,9 +1,5 @@
 package com.gdg.team5.mail.service;
 
-import com.sendgrid.*;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Content;
-import com.sendgrid.helpers.mail.objects.Email;
 import com.gdg.team5.crawling.dto.CrawledJobsDto;
 import com.gdg.team5.crawling.dto.CrawledNewsDto;
 import com.gdg.team5.mail.domain.EmailLog;
@@ -11,12 +7,15 @@ import com.gdg.team5.mail.dto.JobEmailDto;
 import com.gdg.team5.mail.dto.NewsEmailDto;
 import com.gdg.team5.mail.dto.NewsletterResponseDto;
 import com.gdg.team5.mail.repository.EmailLogRepository;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,15 +25,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final SendGrid sendGrid;
+    private final JavaMailSender mailSender;
     private final EmailTemplateBuilder emailTemplateBuilder;
     private final EmailLogRepository emailLogRepository;
 
-    @Value("${sendgrid.from-email}")
+    @Value("${spring.mail.username}")
     private String fromEmail;
-
-    @Value("${sendgrid.from-name:GDG on Campus KHU}"
-    private String fromName;
 
     public NewsletterResponseDto sendNewsletter(String userId, String userEmail, String userName,
                                                 List<CrawledNewsDto> crawledNewsList,
@@ -43,38 +39,33 @@ public class EmailService {
             List<NewsEmailDto> newsList = convertToNewsEmailDto(crawledNewsList);
             List<JobEmailDto> jobsList = convertToJobEmailDto(crawledJobsList);
 
-            Email from = new Email(fromEmail, fromName);
-            Email to = new Email(userEmail);
-            String subject = String.format("오늘의 소식 | 뉴스 %d건, 채용 %d건",
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(userEmail);
+            helper.setSubject(String.format("🚀 [GDG] 오늘의 소식 | 뉴스 %d건, 채용 %d건",
                 newsList.size(),
-                jobsList.size());
+                jobsList.size()));
 
             String htmlContent = emailTemplateBuilder.buildNewsletterTemplate(userName, newsList, jobsList);
-            Content content = new Content("text/html", htmlContent);
+            helper.setText(htmlContent, true);
 
-            Mail mail = new Mail(from, subject, to, content);
+            mailSender.send(message);
 
-            Request request = new Request();
-            request.setMethod(Method.POST);
-            request.setEndpoint("mail/send");
-            request.setBody(mail.build());
+            saveEmailLog(userId, newsList, jobsList, true, null);
 
-            Response response = sendGrid.api(request);
-
-            boolean isSuccess = (response.getStatusCode() >= 200 && response.getStatusCode() < 300);
-            saveEmailLog(userId, newsList, jobsList, isSuccess, null);
-
-            log.info("이메일 발송 완료: {} - 상태코드: {}", userEmail, response.getStatusCode());
+            log.info("이메일 발송 완료: {}", userEmail);
 
             return new NewsletterResponseDto(
-                isSuccess,
-                "이메일이 성공적으로 발송되었습니다.",
+                true,
+                "뉴스레터가 성공적으로 발송되었습니다.",
                 userEmail,
                 newsList.size(),
                 jobsList.size()
             );
 
-        } catch (IOException e) {
+        } catch (MessagingException e) {
             log.error("이메일 발송 실패: {}", userEmail, e);
             saveEmailLog(userId, null, null, false, e.getMessage());
 
