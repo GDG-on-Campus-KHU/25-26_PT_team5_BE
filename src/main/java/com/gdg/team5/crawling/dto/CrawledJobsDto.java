@@ -2,6 +2,7 @@ package com.gdg.team5.crawling.dto;
 
 
 public record CrawledJobsDto(
+    String source,
     String externalId,
     String title,
     String companyName,

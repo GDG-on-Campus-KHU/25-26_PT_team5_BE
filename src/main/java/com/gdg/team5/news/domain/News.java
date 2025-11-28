@@ -8,7 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "news")
+@Table(name = "news",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_news_source_externalId",
+            columnNames = {"source", "externalId"}
+        )
+    }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class News {
@@ -16,7 +23,12 @@ public class News {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String source;
+
+    @Column(nullable = false)
     private String externalId;
+
     private String title;
     private String url;
     private String publishedDate;
@@ -28,9 +40,10 @@ public class News {
     private String content;
 
     @Builder
-    public News(String externalId, String title, String url,
+    public News(String source, String externalId, String title, String url,
                 String publishedDate, String category, String reporter,
                 String provider, String thumbnailUrl, String content) {
+        this.source = source;
         this.externalId = externalId;
         this.title = title;
         this.url = url;
@@ -43,6 +56,7 @@ public class News {
     }
 
     public void updateFromNewsDto(CrawledNewsDto crawledNewsDto) {
+        this.source = crawledNewsDto.source();
         this.externalId = crawledNewsDto.externalId();
         this.title = crawledNewsDto.title();
         this.url = crawledNewsDto.url();

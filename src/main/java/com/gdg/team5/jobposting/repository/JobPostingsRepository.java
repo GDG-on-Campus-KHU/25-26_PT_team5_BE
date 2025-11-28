@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface JobPostingsRepository extends JpaRepository<JobPostings, Long> {
-    Optional<JobPostings> findByExternalId(String externalId);
+    Optional<JobPostings> findBySourceAndExternalId(String source, String externalId);
 
     List<JobPostings> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrTechStackContainingIgnoreCase(
         String titleKeyword,

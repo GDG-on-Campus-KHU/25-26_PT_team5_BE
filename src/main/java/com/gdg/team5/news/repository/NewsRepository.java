@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface NewsRepository extends JpaRepository<News, Long> {
-    Optional<News> findByExternalId(String externalId);
+    Optional<News> findBySourceAndExternalId(String source, String externalId);
 
     List<News> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(
         String titleKeyWord, String contentKeyWord);

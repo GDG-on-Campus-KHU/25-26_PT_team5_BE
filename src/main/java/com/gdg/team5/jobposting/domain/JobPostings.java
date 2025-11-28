@@ -8,7 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "jobs")
+@Table(name = "jobs",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_jobs_source_externalId",
+            columnNames = {"source", "externalId"}
+        )
+    }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class JobPostings {
@@ -16,7 +23,12 @@ public class JobPostings {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String source;
+
+    @Column(nullable = false)
     private String externalId;
+
     private String title;
     private String companyName;
     private String url;
@@ -32,10 +44,11 @@ public class JobPostings {
     private String content;
 
     @Builder
-    public JobPostings(String externalId, String title, String companyName,
+    public JobPostings(String source, String externalId, String title, String companyName,
                        String url, String postedDate, String deadLine,
                        String category, String techStack, String location,
                        String expLevel, String thumbnailUrl, String content) {
+        this.source = source;
         this.externalId = externalId;
         this.title = title;
         this.companyName = companyName;
@@ -52,6 +65,7 @@ public class JobPostings {
 
 
     public void updateFromJobsDto(CrawledJobsDto crawledJobsDto) {
+        this.source = crawledJobsDto.source();
         this.externalId = crawledJobsDto.externalId();
         this.title = crawledJobsDto.title();
         this.companyName = crawledJobsDto.companyName();

@@ -35,12 +35,13 @@ public class NewsService {
 
             // 1. 기존 뉴스 찾기
             News news = newsRepository
-                .findByExternalId(dto.externalId())
+                .findBySourceAndExternalId(dto.source(), dto.externalId())
                 .orElse(null);
 
             // 2. 데이터 업데이트
             if (news == null) {
                 news = News.builder()
+                    .source(dto.source())
                     .externalId(dto.externalId())
                     .title(dto.title())
                     .url(dto.url())

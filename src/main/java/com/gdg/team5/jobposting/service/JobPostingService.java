@@ -37,12 +37,13 @@ public class JobPostingService {
 
             // 1. 기존 채용 공고 찾기
             JobPostings jobPostings = jobPostingsRepository
-                .findByExternalId(dto.externalId())
+                .findBySourceAndExternalId(dto.source(), dto.externalId())
                 .orElse(null);
 
             // 2. 없을 경우 신규 생성
             if (jobPostings == null) {
                 jobPostings = JobPostings.builder()
+                    .source(dto.source())
                     .externalId(dto.externalId())
                     .title(dto.title())
                     .content(dto.content())
