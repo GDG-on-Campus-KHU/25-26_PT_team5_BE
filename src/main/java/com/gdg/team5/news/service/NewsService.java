@@ -6,34 +6,47 @@ import com.gdg.team5.news.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NewsService {
     private final NewsRepository newsRepository;
 
     // 크롤링된 뉴스 저장 (업데이트 or 신규 생성)
     public void saveCrawledNews(List<CrawledNewsDto> items) {
+        if (items == null || items.isEmpty()) {
+            log.info("크롤링된 뉴스 없음");
+            return;
+        }
 
         for (CrawledNewsDto dto : items) {
 
             // 1. 기존 뉴스 찾기
-            News news = newsRepository.findByExternalId(dto.getExternalId())
-                .orElse(new News());
+            News news = newsRepository
+                .findByExternalId(dto.externalId())
+                .orElse(null);
 
             // 2. 데이터 업데이트
-            news.setExternalId(dto.getExternalId());
-            news.setTitle(dto.getTitle());
-            news.setContent(dto.getContent());
-            news.setUrl(dto.getUrl());
-            news.setPublishedDate(dto.getPublishedDate());
-            news.setCategory(dto.getCategory());
-            news.setReporter(dto.getReporter());
-            news.setProvider(dto.getProvider());
-            news.setThumbnailUrl(dto.getThumbnailUrl());
+            if (news == null) {
+                news = News.builder()
+                    .externalId(dto.externalId())
+                    .title(dto.title())
+                    .url(dto.url())
+                    .publishedDate(dto.publishedDate())
+                    .content(dto.content())
+                    .reporter(dto.reporter())
+                    .provider(dto.provider())
+                    .thumbnailUrl(dto.thumbnailUrl())
+                    .content(dto.content())
+                    .build();
+            } else {
+                news.updateFromNewsDto(dto);
+            }
 
             newsRepository.save(news);
 
