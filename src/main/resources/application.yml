@@ -13,8 +13,8 @@ spring:
     mail:
         host: smtp.gmail.com
         port: 587
-        username: dhwlsgur795@khu.ac.kr  # 본인 Gmail 주소로 변경!
-        password: sjsj uqev gxqt hutf   # 앱 비밀번호 16자리 (공백 포함)
+        username: ${MAIL_USERNAME}  # 본인 Gmail 주소로 변경!
+        password: ${MAIL_PASSWORD}   # 앱 비밀번호 16자리 (공백 포함)
         properties:
             mail:
                 smtp:
