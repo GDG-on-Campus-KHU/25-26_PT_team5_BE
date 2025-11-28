@@ -1,13 +1,11 @@
 package com.gdg.team5.crawling.controller;
 
+import com.gdg.team5.common.response.BaseResponse;
 import com.gdg.team5.crawling.service.CrawlingRequestService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,24 +14,14 @@ public class CrawlingController {
     private final CrawlingRequestService crawlingRequestService;
 
     @PostMapping("/news")
-    public ResponseEntity<?> triggerNewsCrawling() {
+    public BaseResponse<String> triggerNewsCrawling() {
         crawlingRequestService.crawlNewsAndSave();
-        return ResponseEntity.ok(
-            Map.of(
-                "status", 200,
-                "message", "뉴스 크롤링 & 저장 요청 완료"
-            )
-        );
+        return new BaseResponse<>("뉴스 크롤링 & 저장 요청 완료");
     }
 
     @PostMapping("/jobs")
-    public ResponseEntity<?> triggerJobsCrawling() {
+    public BaseResponse<String> triggerJobsCrawling() {
         crawlingRequestService.crawlJobsAndSave();
-        return ResponseEntity.ok(
-            Map.of(
-                "status", 200,
-                "message", "채용공고 크롤링 & 저장 요청 완료"
-            )
-        );
+        return new BaseResponse<>("채용공고 크롤링 & 저장 요청 완료");
     }
 }

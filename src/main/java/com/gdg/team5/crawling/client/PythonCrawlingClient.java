@@ -16,9 +16,8 @@ public class PythonCrawlingClient {
 
     private final WebClient pythonWebClient;
 
-    public List<CrawledNewsDto> reqeustNewsCrawling() {
+    public List<CrawledNewsDto> requestNewsCrawling() {
         log.info("뉴스 크롤링 요청 to 파이썬 서버");
-
         return pythonWebClient.post()
             .uri("/crawl/news")
             .retrieve()

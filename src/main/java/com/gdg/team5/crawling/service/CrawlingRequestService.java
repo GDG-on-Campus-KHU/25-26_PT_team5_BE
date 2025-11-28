@@ -5,12 +5,14 @@ import com.gdg.team5.crawling.dto.CrawledJobsDto;
 import com.gdg.team5.crawling.dto.CrawledNewsDto;
 import com.gdg.team5.jobposting.service.JobPostingService;
 import com.gdg.team5.news.service.NewsService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Transactional
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class CrawlingRequestService {
     public void crawlNewsAndSave() {
         log.info("뉴스 크롤링 & 저장 시작");
 
-        List<CrawledNewsDto> items = pythonCrawlingClient.reqeustNewsCrawling();
+        List<CrawledNewsDto> items = pythonCrawlingClient.requestNewsCrawling();
         log.info("뉴스 {}건 수신", items.size());
 
         newsService.saveCrawledNews(items);
