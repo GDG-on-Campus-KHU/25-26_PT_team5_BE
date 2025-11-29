@@ -88,7 +88,7 @@ public class JobPostingService {
                 continue;
             }
 
-            List<JobPostings> jobPostingsList = jobPostingsRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrTechStackContainingIgnoreCase(
+            List<JobPostings> jobPostingsList = jobPostingsRepository.findByTitleContainingIgnoreCaseOrContentContainingOrTechStackContainingIgnoreCase(
                 keyword,
                 keyword,
                 keyword

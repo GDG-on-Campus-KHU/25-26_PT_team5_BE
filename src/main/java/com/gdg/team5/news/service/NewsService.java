@@ -80,7 +80,7 @@ public class NewsService {
                 continue;
             }
 
-            List<News> newsList = newsRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(
+            List<News> newsList = newsRepository.findByTitleContainingIgnoreCaseOrContentContaining(
                 keyword, keyword
             );
 
