@@ -1,6 +1,8 @@
 package com.gdg.team5.scrap.controller;
 
+import com.gdg.team5.common.response.BaseResponse;
 import com.gdg.team5.scrap.domain.ScrapType;
+import com.gdg.team5.scrap.dto.ScrapResponseDto;
 import com.gdg.team5.scrap.service.ScrapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,5 +58,10 @@ public class ScrapController {
         return ResponseEntity.ok()
             .header("Content-Type", "text/html; charset=UTF-8")
             .body(html);
+    }
+
+    @GetMapping("")
+    public BaseResponse<List<ScrapResponseDto>> getScraps() {
+        return new BaseResponse<>(scrapService.getScraps());
     }
 }

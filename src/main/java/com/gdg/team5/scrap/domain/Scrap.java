@@ -1,7 +1,6 @@
 package com.gdg.team5.scrap.domain;
 
 import com.gdg.team5.auth.domain.User;
-import com.gdg.team5.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Scrap extends BaseTimeEntity {
+public class Scrap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
