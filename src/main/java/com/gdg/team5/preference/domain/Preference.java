@@ -1,16 +1,14 @@
 package com.gdg.team5.preference.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Preference {
 
     @Id
@@ -18,7 +16,15 @@ public class Preference {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    public void setId(Long id) {
-        this.id = id;
+    @Column(nullable = false)
+    private String keyword;
+
+    @Column(nullable = false)
+    private String type;
+
+    @Builder
+    public Preference(String type, String keyword) {
+        this.type = type;
+        this.keyword = keyword;
     }
 }
