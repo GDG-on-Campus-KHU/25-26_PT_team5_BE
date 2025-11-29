@@ -35,10 +35,13 @@ public class ScrapService {
     private final NewsRepository newsRepository;
     private final JobPostingsRepository jobPostingsRepository;
 
+    // 스크랩 저장
     @Transactional
     public void saveScrap(Long userId, ScrapType type, Long contentId) {
+        // 이미 존재하는 스크랩인 경우 무시
         if (scrapRepository.existsByUserIdAndTypeAndContentId(userId, type, contentId))
             return;
+        // 저장
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
         Scrap scrap = Scrap.builder()
@@ -49,16 +52,20 @@ public class ScrapService {
         scrapRepository.save(scrap);
     }
 
+    // 스크랩 목록 조회
     public List<ScrapResponseDto> getScraps() {
         // 임시 유저 객체
         User user = User.builder()
             .id(1L)
             .build();
 
+        // 모든 스크랩 내역 조회
         List<Scrap> scraps = scrapRepository.findAllByUserId(user.getId());
+        // 없으면 빈 리스트 반환
         if (scraps.isEmpty()) {
             return List.of();
         }
+        // 뉴스/공고 아이디 분리
         List<Long> newsIds = new ArrayList<>();
         List<Long> jobIds = new ArrayList<>();
         for (Scrap scrap : scraps) {
@@ -68,14 +75,15 @@ public class ScrapService {
                 newsIds.add(scrap.getContentId());
             }
         }
-
+        // 각각 {뉴스 ID : 뉴스 객체} 형태의 Map으로 매핑
+        // O(1)에 조회 가능
         Map<Long, News> newsMap = newsIds.isEmpty() ? Collections.emptyMap() :
             newsRepository.findAllById(newsIds).stream()
                 .collect(Collectors.toMap(News::getId, Function.identity()));
         Map<Long, JobPostings> jobMap = jobIds.isEmpty() ? Collections.emptyMap() :
             jobPostingsRepository.findAllById(jobIds).stream()
                 .collect(Collectors.toMap(JobPostings::getId, Function.identity()));
-
+        // DTO로 변환하여 반환
         return scraps.stream()
             .map(scrap -> {
                 if (scrap.getType() == ScrapType.JOB) {
@@ -87,6 +95,7 @@ public class ScrapService {
             .collect(Collectors.toList());
     }
 
+    // 스크랩 삭제
     @Transactional
     public void deleteScrap(Long scrapId) {
         scrapRepository.deleteById(scrapId);

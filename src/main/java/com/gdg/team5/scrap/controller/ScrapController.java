@@ -17,11 +17,16 @@ public class ScrapController {
 
     private final ScrapService scrapService;
 
+    // 스크랩 저장
+    // 이메일에선 GET만 가능 -> 링크 삽입 방식
     @GetMapping("/save")
     public ResponseEntity<String> saveScrap(@RequestParam Long userId,
                                             @RequestParam ScrapType type,
                                             @RequestParam Long contentId) {
+        // 저장
         scrapService.saveScrap(userId, type, contentId);
+        // 정상 저장 확인 문구
+        // 확인 누르면 원래 페이지로 돌아감
         String html = """
             <!DOCTYPE html>
             <html>
@@ -52,16 +57,19 @@ public class ScrapController {
             </body>
             </html>
             """;
+        // HTML을 띄우려면 BaseResponse가 아닌 ResponseEntity 사용이 필수라서 예외적으로 사용
         return ResponseEntity.ok()
             .header("Content-Type", "text/html; charset=UTF-8")
             .body(html);
     }
 
+    // 스크랩 목록 조회
     @GetMapping("")
     public BaseResponse<List<ScrapResponseDto>> getScraps() {
         return new BaseResponse<>(scrapService.getScraps());
     }
 
+    // 스크랩 삭제
     @DeleteMapping("/{scrapId}")
     public BaseResponse<String> deleteScrap(@PathVariable Long scrapId) {
         scrapService.deleteScrap(scrapId);
