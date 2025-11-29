@@ -86,4 +86,9 @@ public class ScrapService {
             })
             .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteScrap(Long scrapId) {
+        scrapRepository.deleteById(scrapId);
+    }
 }

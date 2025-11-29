@@ -6,10 +6,7 @@ import com.gdg.team5.scrap.dto.ScrapResponseDto;
 import com.gdg.team5.scrap.service.ScrapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -63,5 +60,11 @@ public class ScrapController {
     @GetMapping("")
     public BaseResponse<List<ScrapResponseDto>> getScraps() {
         return new BaseResponse<>(scrapService.getScraps());
+    }
+
+    @DeleteMapping("/{scrapId}")
+    public BaseResponse<String> deleteScrap(@PathVariable Long scrapId) {
+        scrapService.deleteScrap(scrapId);
+        return new BaseResponse<>("스크랩 삭제 성공");
     }
 }
