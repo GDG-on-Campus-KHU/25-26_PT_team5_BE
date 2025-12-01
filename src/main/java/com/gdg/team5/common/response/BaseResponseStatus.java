@@ -10,7 +10,9 @@ public enum BaseResponseStatus {
 
     // 기타 에러
     DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 연결에 실패하였습니다."),
-    SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다.");
+    SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다."),
+    UNAUTHORIZED_ERROR(false, 4001, "인증에 실패하였습니다."),
+    USER_EXIST_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "이미 존재하는 이메일입니다.");
 
     private final boolean isSuccess;
     private final int code;
