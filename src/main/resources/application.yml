@@ -1,8 +1,8 @@
 spring:
-    datasource:
-        url: ${DB_URL}
-        username: ${DB_USER}
-        password: ${DB_PASSWORD}
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
 
     jpa:
         hibernate:
@@ -25,3 +25,7 @@ spring:
                     connectiontimeout: 5000
                     timeout: 5000
                     writetimeout: 5000
+
+python:
+    crawling:
+        base-url: ${PYTHON_SERVER_URL:http://localhost:8000}
