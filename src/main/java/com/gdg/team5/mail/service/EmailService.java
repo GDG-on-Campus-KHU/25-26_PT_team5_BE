@@ -4,14 +4,16 @@ import com.gdg.team5.crawling.dto.CrawledJobsDto;
 import com.gdg.team5.crawling.dto.CrawledNewsDto;
 import com.gdg.team5.mail.domain.EmailLog;
 import com.gdg.team5.mail.dto.EmailResponseDto;
-import com.gdg.team5.mail.dto.JobEmailDto;
-import com.gdg.team5.mail.dto.NewsEmailDto;
 import com.gdg.team5.mail.repository.EmailLogRepository;
+import com.gdg.team5.news.domain.News;
+import com.gdg.team5.news.repository.NewsRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -28,16 +30,21 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final EmailTemplateBuilder emailTemplateBuilder;
     private final EmailLogRepository emailLogRepository;
+    private final NewsRepository newsRepository;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public EmailResponseDto sendNewsletter(String userId, String userEmail, String userName,
-                                           List<CrawledNewsDto> crawledNewsList,
-                                           List<CrawledJobsDto> crawledJobsList) {
+    /**
+     * 뉴스레터 발송
+     */
+    public EmailResponseDto sendNewsletter(String userId, String userEmail, String userName) {
         try {
-            List<NewsEmailDto> newsList = convertToNewsEmailDto(crawledNewsList);
-            List<JobEmailDto> jobsList = convertToJobEmailDto(crawledJobsList);
+            // DB에서 최근 뉴스 조회
+            List<CrawledNewsDto> newsList = getRecentNewsFromDb();
+
+            // DB에서 최근 채용공고 조회 (TODO: 구현 예정)
+            List<CrawledJobsDto> jobsList = getRecentJobsFromDb();
 
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -59,7 +66,7 @@ public class EmailService {
 
             return new EmailResponseDto(
                 true,
-                "뉴스레터가 성공적으로 발송되었습니다.",
+                "이메일이 성공적으로 발송되었습니다.",
                 userEmail,
                 newsList.size(),
                 jobsList.size()
@@ -79,63 +86,100 @@ public class EmailService {
         }
     }
 
-    private List<NewsEmailDto> convertToNewsEmailDto(List<CrawledNewsDto> crawledNewsList) {
-        if (crawledNewsList == null) {
-            return List.of();
-        }
+    /**
+     * DB에서 최근 뉴스 조회 및 CrawledNewsDto 변환
+     */
+    private List<CrawledNewsDto> getRecentNewsFromDb() {
+        log.info("DB에서 최근 뉴스 조회 시작");
 
-        return crawledNewsList.stream()
-            .map(news -> new NewsEmailDto(
+        // 최근 10개 뉴스 조회
+        List<News> recentNews = newsRepository.findAll(
+            PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))
+        ).getContent();
+
+        // News → CrawledNewsDto 변환
+        List<CrawledNewsDto> result = recentNews.stream()
+            .map(news -> new CrawledNewsDto(
+                news.getSource(),
+                news.getExternalId(),
                 news.getTitle(),
-                summarizeContent(news.getContent()),
+                summarizeContent(news.getContent()),  // 200자 요약
                 news.getUrl(),
-                news.getThumbnailUrl(),
+                news.getPublishedDate(),
                 news.getCategory(),
-                news.getPublishedDate()
+                news.getReporter(),
+                news.getProvider(),
+                news.getThumbnailUrl()
             ))
             .collect(Collectors.toList());
+
+        log.info("DB에서 뉴스 {}건 조회 완료", result.size());
+        return result;
     }
 
-    private List<JobEmailDto> convertToJobEmailDto(List<CrawledJobsDto> crawledJobsList) {
-        if (crawledJobsList == null) {
-            return List.of();
-        }
+    /**
+     * DB에서 최근 채용공고 조회 및 CrawledJobsDto 변환
+     * TODO: JobPostingRepository 추가 후 구현
+     */
+    private List<CrawledJobsDto> getRecentJobsFromDb() {
+        log.warn("채용공고 조회 미구현 - 빈 리스트 반환");
+        return List.of();
 
-        return crawledJobsList.stream()
-            .map(job -> new JobEmailDto(
+        /* TODO: JobPostingRepository 추가 후 이렇게 구현
+        log.info("DB에서 최근 채용공고 조회 시작");
+
+        List<JobPosting> recentJobs = jobPostingRepository.findAll(
+            PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))
+        ).getContent();
+
+        List<CrawledJobsDto> result = recentJobs.stream()
+            .map(job -> new CrawledJobsDto(
+                job.getSource(),
+                job.getExternalId(),
                 job.getTitle(),
                 job.getCompanyName(),
                 summarizeContent(job.getContent()),
                 job.getUrl(),
-                job.getThumbnailUrl(),
+                job.getPostedDate(),
+                job.getDeadLine(),
+                job.getCategory(),
+                job.getTechStack(),
                 job.getLocation(),
-                job.getDeadLine()
+                job.getExpLevel(),
+                job.getThumbnailUrl()
             ))
             .collect(Collectors.toList());
+
+        log.info("DB에서 채용공고 {}건 조회 완료", result.size());
+        return result;
+        */
     }
 
+    /**
+     * 본문 요약 (200자 제한)
+     */
     private String summarizeContent(String content) {
         if (content == null || content.isEmpty()) {
             return "";
         }
-
-        if (content.length() <= 200) {
-            return content;
-        }
-
-        return content.substring(0, 200) + "...";
+        return content.length() <= 200
+            ? content
+            : content.substring(0, 200) + "...";
     }
 
+    /**
+     * 이메일 발송 로그 저장
+     */
     private void saveEmailLog(String userId,
-                              List<NewsEmailDto> newsList,
-                              List<JobEmailDto> jobsList,
+                              List<CrawledNewsDto> newsList,
+                              List<CrawledJobsDto> jobsList,
                               boolean isSuccess,
                               String errorMsg) {
         try {
             String newsStr = null;
             if (newsList != null && !newsList.isEmpty()) {
                 newsStr = newsList.stream()
-                    .map(NewsEmailDto::title)
+                    .map(CrawledNewsDto::title)  // ← CrawledNewsDto 사용!
                     .limit(5)
                     .collect(Collectors.joining(", "));
 
@@ -147,7 +191,7 @@ public class EmailService {
             String jobsStr = null;
             if (jobsList != null && !jobsList.isEmpty()) {
                 jobsStr = jobsList.stream()
-                    .map(JobEmailDto::title)
+                    .map(CrawledJobsDto::title)  // ← CrawledJobsDto 사용!
                     .limit(5)
                     .collect(Collectors.joining(", "));
 
