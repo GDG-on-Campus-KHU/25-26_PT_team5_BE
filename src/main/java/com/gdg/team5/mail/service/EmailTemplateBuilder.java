@@ -45,7 +45,7 @@ public class EmailTemplateBuilder {
 
         html.append("<div class='content'>");
 
-        // 뉴스 섹션
+        // 뉴스
         if (newsList != null && !newsList.isEmpty()) {
             html.append("<h2 class='section-title'>📰 최신 뉴스 (").append(newsList.size()).append(")</h2>");
 
@@ -67,7 +67,7 @@ public class EmailTemplateBuilder {
             }
         }
 
-        // 채용 공고 섹션
+        // 채용 공고
         if (jobsList != null && !jobsList.isEmpty()) {
             html.append("<h2 class='section-title'>💼 채용 공고 (").append(jobsList.size()).append(")</h2>");
 
@@ -98,7 +98,6 @@ public class EmailTemplateBuilder {
 
         html.append("</div>");
 
-        // Footer
         html.append("<div class='footer'>");
         html.append("<p>이 메일은 GDG on Campus KHU Team 5에서 발송되었습니다.</p>");
         html.append("</div>");

@@ -3,9 +3,9 @@ package com.gdg.team5.mail.service;
 import com.gdg.team5.crawling.dto.CrawledJobsDto;
 import com.gdg.team5.crawling.dto.CrawledNewsDto;
 import com.gdg.team5.mail.domain.EmailLog;
+import com.gdg.team5.mail.dto.EmailResponseDto;
 import com.gdg.team5.mail.dto.JobEmailDto;
 import com.gdg.team5.mail.dto.NewsEmailDto;
-import com.gdg.team5.mail.dto.NewsletterResponseDto;
 import com.gdg.team5.mail.repository.EmailLogRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -32,9 +32,9 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public NewsletterResponseDto sendNewsletter(String userId, String userEmail, String userName,
-                                                List<CrawledNewsDto> crawledNewsList,
-                                                List<CrawledJobsDto> crawledJobsList) {
+    public EmailResponseDto sendNewsletter(String userId, String userEmail, String userName,
+                                           List<CrawledNewsDto> crawledNewsList,
+                                           List<CrawledJobsDto> crawledJobsList) {
         try {
             List<NewsEmailDto> newsList = convertToNewsEmailDto(crawledNewsList);
             List<JobEmailDto> jobsList = convertToJobEmailDto(crawledJobsList);
@@ -57,7 +57,7 @@ public class EmailService {
 
             log.info("이메일 발송 완료: {}", userEmail);
 
-            return new NewsletterResponseDto(
+            return new EmailResponseDto(
                 true,
                 "뉴스레터가 성공적으로 발송되었습니다.",
                 userEmail,
@@ -69,7 +69,7 @@ public class EmailService {
             log.error("이메일 발송 실패: {}", userEmail, e);
             saveEmailLog(userId, null, null, false, e.getMessage());
 
-            return new NewsletterResponseDto(
+            return new EmailResponseDto(
                 false,
                 "이메일 발송 중 오류가 발생했습니다: " + e.getMessage(),
                 userEmail,

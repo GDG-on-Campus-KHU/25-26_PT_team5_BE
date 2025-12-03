@@ -5,14 +5,16 @@ import com.gdg.team5.auth.repository.UserRepository;
 import com.gdg.team5.crawling.dto.CrawledJobsDto;
 import com.gdg.team5.crawling.dto.CrawledNewsDto;
 import com.gdg.team5.crawling.service.CrawlingService;
-import com.gdg.team5.mail.dto.NewsletterResponseDto;
+import com.gdg.team5.mail.dto.EmailResponseDto;
 import com.gdg.team5.mail.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class MailController {
     private final CrawlingService crawlingService;
 
     @PostMapping("/send")
-    public ResponseEntity<NewsletterResponseDto> sendNewsletter(
+    public ResponseEntity<EmailResponseDto> sendNewsletter(
         @AuthenticationPrincipal UserDetails userDetails) {
 
         try {
@@ -46,7 +48,7 @@ public class MailController {
                 newsList.size(), jobsList.size());
 
             // 3. 이메일 발송
-            NewsletterResponseDto response = emailService.sendNewsletter(
+            EmailResponseDto response = emailService.sendNewsletter(
                 user.getId().toString(),  // Long → String 변환
                 user.getEmail(),          // String
                 user.getName(),           // String (User 엔티티에 있음!)
@@ -63,7 +65,7 @@ public class MailController {
             log.error("이메일 발송 중 오류 발생", e);
 
             // 에러 응답 반환
-            NewsletterResponseDto errorResponse = new NewsletterResponseDto(
+            EmailResponseDto errorResponse = new EmailResponseDto(
                 false,
                 "이메일 발송 중 오류가 발생했습니다: " + e.getMessage(),
                 userDetails.getUsername(),
