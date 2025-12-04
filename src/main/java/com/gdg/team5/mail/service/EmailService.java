@@ -2,6 +2,8 @@ package com.gdg.team5.mail.service;
 
 import com.gdg.team5.crawling.dto.CrawledJobsDto;
 import com.gdg.team5.crawling.dto.CrawledNewsDto;
+import com.gdg.team5.jobposting.domain.JobPostings;
+import com.gdg.team5.jobposting.repository.JobPostingsRepository;
 import com.gdg.team5.mail.domain.EmailLog;
 import com.gdg.team5.mail.dto.EmailResponseDto;
 import com.gdg.team5.mail.repository.EmailLogRepository;
@@ -31,6 +33,7 @@ public class EmailService {
     private final EmailTemplateBuilder emailTemplateBuilder;
     private final EmailLogRepository emailLogRepository;
     private final NewsRepository newsRepository;
+    private final JobPostingsRepository jobPostingsRepository;  // ✅ 추가!
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -43,7 +46,7 @@ public class EmailService {
             // DB에서 최근 뉴스 조회
             List<CrawledNewsDto> newsList = getRecentNewsFromDb();
 
-            // DB에서 최근 채용공고 조회 (TODO: 구현 예정)
+            // DB에서 최근 채용공고 조회
             List<CrawledJobsDto> jobsList = getRecentJobsFromDb();
 
             MimeMessage message = mailSender.createMimeMessage();
@@ -119,19 +122,16 @@ public class EmailService {
 
     /**
      * DB에서 최근 채용공고 조회 및 CrawledJobsDto 변환
-     * TODO: JobPostingRepository 추가 후 구현
      */
     private List<CrawledJobsDto> getRecentJobsFromDb() {
-        log.warn("채용공고 조회 미구현 - 빈 리스트 반환");
-        return List.of();
-
-        /* TODO: JobPostingRepository 추가 후 이렇게 구현
         log.info("DB에서 최근 채용공고 조회 시작");
 
-        List<JobPosting> recentJobs = jobPostingRepository.findAll(
+        // 최근 10개 채용공고 조회
+        List<JobPostings> recentJobs = jobPostingsRepository.findAll(
             PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"))
         ).getContent();
 
+        // JobPostings → CrawledJobsDto 변환
         List<CrawledJobsDto> result = recentJobs.stream()
             .map(job -> new CrawledJobsDto(
                 job.getSource(),
@@ -152,7 +152,6 @@ public class EmailService {
 
         log.info("DB에서 채용공고 {}건 조회 완료", result.size());
         return result;
-        */
     }
 
     /**
@@ -179,7 +178,7 @@ public class EmailService {
             String newsStr = null;
             if (newsList != null && !newsList.isEmpty()) {
                 newsStr = newsList.stream()
-                    .map(CrawledNewsDto::title)  // ← CrawledNewsDto 사용!
+                    .map(CrawledNewsDto::title)
                     .limit(5)
                     .collect(Collectors.joining(", "));
 
@@ -191,7 +190,7 @@ public class EmailService {
             String jobsStr = null;
             if (jobsList != null && !jobsList.isEmpty()) {
                 jobsStr = jobsList.stream()
-                    .map(CrawledJobsDto::title)  // ← CrawledJobsDto 사용!
+                    .map(CrawledJobsDto::title)
                     .limit(5)
                     .collect(Collectors.joining(", "));
 
