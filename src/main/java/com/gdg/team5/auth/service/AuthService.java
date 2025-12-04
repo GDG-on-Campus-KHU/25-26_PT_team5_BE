@@ -3,58 +3,48 @@ package com.gdg.team5.auth.service;
 import com.gdg.team5.auth.domain.User;
 import com.gdg.team5.auth.dto.LoginRequest;
 import com.gdg.team5.auth.dto.LoginResponse;
+import com.gdg.team5.auth.dto.SignupRequestDto;
 import com.gdg.team5.auth.repository.UserRepository;
 import com.gdg.team5.auth.util.JwtUtil;
 import com.gdg.team5.common.exception.BaseException;
 import com.gdg.team5.common.response.BaseResponseStatus;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gdg.team5.auth.dto.SignupRequest;
-import com.gdg.team5.auth.dto.SignupResponse;
-
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
-    
-    // final 필드 선언 위치 정리 (클래스 상단에서 한 번에 선언)
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    //---------------------------
-    // 1. 회원가입 기능 추가
     @Transactional
-    public SignupResponse signup(SignupRequest request) {
+    public void signup(SignupRequestDto requestDto) {
 
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.existsByEmail(requestDto.email())) {
             throw new BaseException(BaseResponseStatus.USER_EXIST_EMAIL);
         }
-
-        String encodedPassword = passwordEncoder.encode(request.getPassword());
-
+        String encodedPassword = passwordEncoder.encode(requestDto.password());
         User user = User.builder()
-            .email(request.getEmail())
+            .email(requestDto.email())
             .password(encodedPassword)
-            .name(request.getName())
+            .name(requestDto.name())
             .build();
-            
-        User savedUser = userRepository.save(user);
-
-        return new SignupResponse(savedUser.getId(), "회원가입 성공");
+        userRepository.save(user);
     }
 
 
     //---------------------------
     // 로그인 기능
     public LoginResponse login(LoginRequest request) {
-        
-        // 1. 사용자 조회 및 예외 
+
+        // 1. 사용자 조회 및 예외
         User user = userRepository.findByEmail(request.getEmail())
-            .orElseThrow(() -> new BaseException(BaseResponseStatus.UNAUTHORIZED_ERROR)); 
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.UNAUTHORIZED_ERROR));
         // 2. 비밀번호 검증
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BaseException(BaseResponseStatus.UNAUTHORIZED_ERROR);
@@ -62,7 +52,7 @@ public class AuthService {
 
         // 3. JWT 토큰 생성
         String token = jwtUtil.generateToken(user.getEmail(), user.getId());
-        
+
         return new LoginResponse(token, user.getId());
     }
 

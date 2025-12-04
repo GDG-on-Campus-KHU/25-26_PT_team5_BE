@@ -1,12 +1,11 @@
 package com.gdg.team5.auth.controller;
 
-import com.gdg.team5.auth.dto.*;
+import com.gdg.team5.auth.dto.LoginRequest;
+import com.gdg.team5.auth.dto.LoginResponse;
+import com.gdg.team5.auth.dto.SignupRequestDto;
 import com.gdg.team5.auth.service.AuthService;
 import com.gdg.team5.common.response.BaseResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,20 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final AuthService authService;
 
-
-    // ----------------------------
-    // 1. 회원가입 기능
     @PostMapping("/signup")
-    public BaseResponse<SignupResponse> signup(@RequestBody SignupRequest request) {
-        SignupResponse response = authService.signup(request);
-
-        // BaseResponse 성공 응답 반환
-        return new BaseResponse<SignupResponse>(response);
+    public BaseResponse<String> signup(@RequestBody SignupRequestDto request) {
+        authService.signup(request);
+        return new BaseResponse<>("회원가입에 성공했습니다.");
     }
 
     // ----------------------------
