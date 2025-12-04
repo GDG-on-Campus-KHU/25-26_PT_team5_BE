@@ -44,7 +44,7 @@ public class AuthService {
             
         User savedUser = userRepository.save(user);
 
-        return new SignupResponse(savedUser.id(), "회원가입 성공");
+        return new SignupResponse(savedUser.getId(), "회원가입 성공");
     }
 
 
@@ -56,14 +56,14 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new BaseException(BaseResponseStatus.UNAUTHORIZED_ERROR)); 
         // 2. 비밀번호 검증
-        if (!passwordEncoder.matches(request.getPassword(), user.password())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BaseException(BaseResponseStatus.UNAUTHORIZED_ERROR);
         }
 
         // 3. JWT 토큰 생성
-        String token = jwtUtil.generateToken(user.email(), user.id());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getId());
         
-        return new LoginResponse(token, user.id());
+        return new LoginResponse(token, user.getId());
     }
 
     // 로그아웃 API 삭제 (프론트엔드 처리)
