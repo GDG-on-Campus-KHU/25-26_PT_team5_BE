@@ -2,6 +2,8 @@ package com.gdg.team5.preference.service;
 
 import com.gdg.team5.auth.domain.User;
 import com.gdg.team5.auth.repository.UserRepository;
+import com.gdg.team5.common.exception.BaseException;
+import com.gdg.team5.common.response.BaseResponseStatus;
 import com.gdg.team5.preference.domain.Preference;
 import com.gdg.team5.preference.domain.UserPreference;
 import com.gdg.team5.preference.dto.PreferenceRequestDto;
@@ -25,12 +27,9 @@ public class PreferenceService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void updatePreference(PreferenceRequestDto requestDto) {
-        // 임시 유저 객체
-        User user = User.builder()
-            .id(1L)
-            .build();
-
+    public void updatePreference(PreferenceRequestDto requestDto, Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
         userPreferenceRepository.deleteByUserId(user.getId());
         List<Long> preferenceIds = requestDto.preferenceIds();
         List<Preference> preferences = preferenceRepository.findAllById(preferenceIds);
@@ -43,11 +42,9 @@ public class PreferenceService {
         userPreferenceRepository.saveAll(newPreferences);
     }
 
-    public List<PreferenceResponseDto> getPreference() {
-        // 임시 유저 객체
-        User user = User.builder()
-            .id(1L)
-            .build();
+    public List<PreferenceResponseDto> getPreference(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
 
         List<UserPreference> userPreferences = userPreferenceRepository.findAllByUserIdWithPreference(user.getId());
         if (userPreferences.isEmpty()) {
