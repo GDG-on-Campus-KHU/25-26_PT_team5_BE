@@ -13,8 +13,8 @@ spring:
     mail:
         host: smtp.gmail.com
         port: 587
-        username: ${MAIL_USERNAME}  # 개발자 이메일 주소
-        password: ${MAIL_PASSWORD}   # 앱 비밀번호 16자리 (공백 포함)
+        username: ${MAIL_USERNAME}  # 노션에 이 부분 적어뒀습니다.
+        password: ${MAIL_PASSWORD}
         properties:
             mail:
                 smtp:
@@ -29,3 +29,7 @@ spring:
 python:
     crawling:
         base-url: ${PYTHON_SERVER_URL:http://localhost:8000}
+
+jwt:
+    secret: ${JWT_SECRET}
+    expiration_time: 3600000

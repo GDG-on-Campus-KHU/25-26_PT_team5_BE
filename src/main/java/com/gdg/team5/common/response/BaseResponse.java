@@ -2,11 +2,9 @@ package com.gdg.team5.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 @JsonPropertyOrder({"isSuccess", "code", "message", "data"})
 public class BaseResponse<T> {
 
@@ -29,5 +27,13 @@ public class BaseResponse<T> {
         this.isSuccess = status.isSuccess();
         this.message = status.getMessage();
         this.code = status.getCode();
+    }
+
+    // (옵션) 모든 필드를 명시적으로 초기화하는 생성자를 남겨두는 것은 좋습니다.
+    public BaseResponse(Boolean isSuccess, String message, int code, T data) {
+        this.isSuccess = isSuccess;
+        this.message = message;
+        this.code = code;
+        this.data = data;
     }
 }
