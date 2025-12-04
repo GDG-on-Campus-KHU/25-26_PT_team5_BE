@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
-    @Value("${python-server.base-url}")
+    @Value("${python.crawling.base-url}")
     private String pythonServerBaseUrl;
 
     @Bean

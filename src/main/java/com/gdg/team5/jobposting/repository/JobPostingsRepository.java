@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface JobPostingsRepository extends JpaRepository<JobPostings, Long> {
     Optional<JobPostings> findBySourceAndExternalId(String source, String externalId);
 
-    List<JobPostings> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrTechStackContainingIgnoreCase(
+    List<JobPostings> findByTitleContainingIgnoreCaseOrContentContainingOrTechStackContainingIgnoreCase(
         String titleKeyword,
         String contentKeyword,
         String techStackKeyword
