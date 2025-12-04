@@ -2,11 +2,12 @@ package com.gdg.team5.mail.controller;
 
 import com.gdg.team5.auth.domain.User;
 import com.gdg.team5.auth.repository.UserRepository;
+import com.gdg.team5.common.response.BaseResponse;
+import com.gdg.team5.common.response.BaseResponseStatus;
 import com.gdg.team5.mail.dto.EmailResponseDto;
 import com.gdg.team5.mail.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public class MailController {
     private final UserRepository userRepository;
 
     @PostMapping("/send")
-    public ResponseEntity<EmailResponseDto> sendNewsletter(
+    public BaseResponse<EmailResponseDto> sendNewsletter(
         @AuthenticationPrincipal UserDetails userDetails) {
 
         try {
@@ -44,20 +45,11 @@ public class MailController {
             log.info("이메일 발송 결과: success={}, recipientEmail={}",
                 response.success(), response.recipientEmail());
 
-            return ResponseEntity.ok(response);
+            return new BaseResponse<>(response);
 
         } catch (Exception e) {
             log.error("이메일 발송 중 오류 발생", e);
-
-            EmailResponseDto errorResponse = new EmailResponseDto(
-                false,
-                "이메일 발송 중 오류가 발생했습니다: " + e.getMessage(),
-                userDetails.getUsername(),
-                0,
-                0
-            );
-
-            return ResponseEntity.status(500).body(errorResponse);
+            return new BaseResponse<>(BaseResponseStatus.SERVER_ERROR);
         }
     }
 }

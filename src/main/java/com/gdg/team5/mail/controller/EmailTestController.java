@@ -1,5 +1,7 @@
 package com.gdg.team5.mail.controller;
 
+import com.gdg.team5.common.response.BaseResponse;
+import com.gdg.team5.common.response.BaseResponseStatus;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class EmailTestController {
     private String fromEmail;
 
     @GetMapping("/test")
-    public String testEmail() {
+    public BaseResponse<String> testEmail() {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -38,10 +40,10 @@ public class EmailTestController {
 
             mailSender.send(message);
 
-            return "이메일 발송 성공! 받은편지함을 확인하세요.";
+            return new BaseResponse<>("테스트 이메일 발송 성공");
 
         } catch (MessagingException e) {
-            return "이메일 발송 실패: " + e.getMessage();
+            return new BaseResponse<>(BaseResponseStatus.SERVER_ERROR);
         }
     }
 }

@@ -1,8 +1,8 @@
 spring:
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    datasource:
+        url: ${DB_URL}
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
 
     jpa:
         hibernate:
@@ -13,7 +13,7 @@ spring:
     mail:
         host: smtp.gmail.com
         port: 587
-        username: ${MAIL_USERNAME}  # 본인 Gmail 주소로 변경!
+        username: ${MAIL_USERNAME}  # 개발자 이메일 주소
         password: ${MAIL_PASSWORD}   # 앱 비밀번호 16자리 (공백 포함)
         properties:
             mail:

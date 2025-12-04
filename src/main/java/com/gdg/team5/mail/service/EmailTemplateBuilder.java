@@ -9,7 +9,8 @@ import java.util.List;
 @Component
 public class EmailTemplateBuilder {
 
-    public String buildNewsletterTemplate(String userName,
+    public String buildNewsletterTemplate(String userId,
+                                          String userName,
                                           List<CrawledNewsDto> newsList,
                                           List<CrawledJobsDto> jobsList) {
         StringBuilder html = new StringBuilder();
@@ -30,8 +31,11 @@ public class EmailTemplateBuilder {
         html.append(".card-content { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 15px; }");
         html.append(".card-meta { font-size: 13px; color: #999; margin-bottom: 10px; }");
         html.append(".card-thumbnail { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; }");
-        html.append(".btn { display: inline-block; padding: 10px 20px; background-color: #667eea; color: white; text-decoration: none; border-radius: 5px; font-size: 14px; }");
+        html.append(".btn { display: inline-block; padding: 10px 20px; background-color: #667eea; color: white !important; text-decoration: none; border-radius: 5px; font-size: 14px; margin-right: 10px; }");
         html.append(".btn:hover { background-color: #5568d3; }");
+        html.append(".btn-scrap { display: inline-block; padding: 10px 20px; background-color: #f39c12; color: white !important; text-decoration: none; border-radius: 5px; font-size: 14px; }");
+        html.append(".btn-scrap:hover { background-color: #e67e22; }");
+        html.append(".button-group { margin-top: 15px; }");
         html.append(".tag { display: inline-block; padding: 4px 8px; background-color: #f0f0f0; color: #666; border-radius: 3px; font-size: 12px; margin-right: 5px; }");
         html.append(".footer { background-color: #f9f9f9; padding: 20px; text-align: center; color: #999; font-size: 12px; }");
         html.append("</style>");
@@ -83,10 +87,17 @@ public class EmailTemplateBuilder {
                 // 카테고리
                 if (news.category() != null) {
                     html.append("<span class='tag'>").append(news.category()).append("</span>");
+                    html.append("<br><br>");
                 }
 
-                html.append("<br><br>");
+                // 버튼 그룹
+                html.append("<div class='button-group'>");
                 html.append("<a href='").append(news.url()).append("' class='btn'>기사 전문 보기 →</a>");
+                html.append("<a href='/api/v1/scrap/save?userId=").append(userId)
+                    .append("&type=NEWS&contentId=").append(news.externalId())
+                    .append("' class='btn-scrap'>⭐ 스크랩</a>");
+                html.append("</div>");
+
                 html.append("</div>");
             }
         }
@@ -150,7 +161,14 @@ public class EmailTemplateBuilder {
                     html.append("</div>");
                 }
 
+                // 버튼 그룹
+                html.append("<div class='button-group'>");
                 html.append("<a href='").append(job.url()).append("' class='btn'>지원하기 →</a>");
+                html.append("<a href='/api/v1/scrap/save?userId=").append(userId)
+                    .append("&type=JOB&contentId=").append(job.externalId())
+                    .append("' class='btn-scrap'>⭐ 스크랩</a>");
+                html.append("</div>");
+
                 html.append("</div>");
             }
         }

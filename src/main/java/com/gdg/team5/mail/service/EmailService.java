@@ -5,6 +5,7 @@ import com.gdg.team5.crawling.dto.CrawledNewsDto;
 import com.gdg.team5.jobposting.domain.JobPostings;
 import com.gdg.team5.jobposting.repository.JobPostingsRepository;
 import com.gdg.team5.mail.domain.EmailLog;
+import com.gdg.team5.mail.domain.EmailStatus;
 import com.gdg.team5.mail.dto.EmailResponseDto;
 import com.gdg.team5.mail.repository.EmailLogRepository;
 import com.gdg.team5.news.domain.News;
@@ -58,7 +59,7 @@ public class EmailService {
                 newsList.size(),
                 jobsList.size()));
 
-            String htmlContent = emailTemplateBuilder.buildNewsletterTemplate(userName, newsList, jobsList);
+            String htmlContent = emailTemplateBuilder.buildNewsletterTemplate(userId, userName, newsList, jobsList);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
@@ -204,7 +205,7 @@ public class EmailService {
                 .sentDate(isSuccess ? LocalDateTime.now() : null)
                 .news(newsStr)
                 .job(jobsStr)
-                .status(isSuccess ? "SUCCESS" : "FAIL")
+                .status(isSuccess ? EmailStatus.SUCCESS : EmailStatus.FAIL)
                 .errorMessage(errorMsg)
                 .build();
 
