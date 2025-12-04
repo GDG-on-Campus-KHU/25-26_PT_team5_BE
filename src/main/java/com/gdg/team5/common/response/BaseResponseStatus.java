@@ -8,12 +8,18 @@ public enum BaseResponseStatus {
     // 성공
     SUCCESS(true, HttpStatus.OK.value(), "요청에 성공하였습니다."),
 
+    // 유저 관련 에러
+    USER_NOT_FOUND(false, HttpStatus.BAD_REQUEST.value(), "유저를 찾을 수 없습니다."),
+    UNAUTHORIZED_ERROR(false, HttpStatus.UNAUTHORIZED.value(), "인증에 실패하였습니다."),
+    USER_EXIST_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "이미 존재하는 이메일입니다."),
+
+    // 관심 관련 에러
+    PREFERENCE_NOT_FOUND(false, HttpStatus.BAD_REQUEST.value(), "관심을 찾을 수 없습니다."),
+    PREFERENCE_USER_NOT_FOUND(false, HttpStatus.BAD_REQUEST.value(), "해당 유저의 관심 정보를 찾을 수 없습니다."),
+
     // 기타 에러
     DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 연결에 실패하였습니다."),
-    SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다."),
-    UNAUTHORIZED_ERROR(false, 4001, "인증에 실패하였습니다."),
-    USER_EXIST_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "이미 존재하는 이메일입니다."),
-    USER_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "해당 유저를 찾을 수 없습니다."),;
+    SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다.");
 
     private final boolean isSuccess;
     private final int code;
