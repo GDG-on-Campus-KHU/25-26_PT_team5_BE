@@ -43,22 +43,19 @@ public class ScrapService {
             return;
         // 저장
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
         Scrap scrap = Scrap.builder()
-            .user(user)
-            .type(type)
-            .contentId(contentId)
-            .build();
+                .user(user)
+                .type(type)
+                .contentId(contentId)
+                .build();
         scrapRepository.save(scrap);
     }
 
     // 스크랩 목록 조회
-    public List<ScrapResponseDto> getScraps() {
-        // 임시 유저 객체
-        User user = User.builder()
-            .id(1L)
-            .build();
-
+    public List<ScrapResponseDto> getScraps(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_FOUND));
         // 모든 스크랩 내역 조회
         List<Scrap> scraps = scrapRepository.findAllByUserId(user.getId());
         // 없으면 빈 리스트 반환
@@ -78,21 +75,21 @@ public class ScrapService {
         // 각각 {뉴스 ID : 뉴스 객체} 형태의 Map으로 매핑
         // O(1)에 조회 가능
         Map<Long, News> newsMap = newsIds.isEmpty() ? Collections.emptyMap() :
-            newsRepository.findAllById(newsIds).stream()
-                .collect(Collectors.toMap(News::getId, Function.identity()));
+                newsRepository.findAllById(newsIds).stream()
+                        .collect(Collectors.toMap(News::getId, Function.identity()));
         Map<Long, JobPostings> jobMap = jobIds.isEmpty() ? Collections.emptyMap() :
-            jobPostingsRepository.findAllById(jobIds).stream()
-                .collect(Collectors.toMap(JobPostings::getId, Function.identity()));
+                jobPostingsRepository.findAllById(jobIds).stream()
+                        .collect(Collectors.toMap(JobPostings::getId, Function.identity()));
         // DTO로 변환하여 반환
         return scraps.stream()
-            .map(scrap -> {
-                if (scrap.getType() == ScrapType.JOB) {
-                    return ScrapJobResponseDto.from(scrap, jobMap.get(scrap.getContentId()));
-                } else {
-                    return ScrapNewsResponseDto.from(scrap, newsMap.get(scrap.getContentId()));
-                }
-            })
-            .collect(Collectors.toList());
+                .map(scrap -> {
+                    if (scrap.getType() == ScrapType.JOB) {
+                        return ScrapJobResponseDto.from(scrap, jobMap.get(scrap.getContentId()));
+                    } else {
+                        return ScrapNewsResponseDto.from(scrap, newsMap.get(scrap.getContentId()));
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     // 스크랩 삭제
