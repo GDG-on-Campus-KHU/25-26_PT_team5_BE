@@ -26,7 +26,7 @@ public class AuthController {
     @PostMapping("/signup")
     public BaseResponse<SignupResponse> signup(@RequestBody SignupRequest request) {
         SignupResponse response = authService.signup(request);
-        
+
         // BaseResponse 성공 응답 반환
         return new BaseResponse<SignupResponse>(response);
     }
@@ -36,22 +36,23 @@ public class AuthController {
     @PostMapping("/login")
     public BaseResponse<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
-        
+
         // BaseResponse 성공 응답 반환
         return new BaseResponse<LoginResponse>(response);
     }
 
-    // ----------------------------
-    //3. 로그아웃 기능
-    @PostMapping("/logout")
-    public BaseResponse<LogoutResponse> logout(HttpServletRequest request) {
-        authService.logout(request);
-
-        LogoutResponse response = new LogoutResponse(true, "로그아웃 되었습니다.");
-        
-        // BaseResponse 성공 응답 반환
-        return new BaseResponse<LogoutResponse>(response);
-    }
-
+    ////service에서 logout 메서드를 삭제했으면 controller에서도 삭제해야함
+//    // ----------------------------
+//    //3. 로그아웃 기능
+//    @PostMapping("/logout")
+//    public BaseResponse<LogoutResponse> logout(HttpServletRequest request) {
+//        authService.logout(request);
+//
+//        LogoutResponse response = new LogoutResponse(true, "로그아웃 되었습니다.");
+//
+//        // BaseResponse 성공 응답 반환
+//        return new BaseResponse<LogoutResponse>(response);
+//    }
+//
 
 }
