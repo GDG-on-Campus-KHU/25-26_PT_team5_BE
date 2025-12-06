@@ -40,7 +40,7 @@ public class CrawlingRequestService {
         log.info("채용공고 {}건 수신", items.size());
 
         jobPostingService.saveCrawledJobPostings(items);
-        log.info("뉴스 저장 완료");
+        log.info("채용공고 저장 완료");
     }
 
 }

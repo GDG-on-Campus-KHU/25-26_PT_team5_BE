@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.7'
+    id 'org.springframework.boot' version '3.3.5'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -40,6 +40,8 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // [필수 추가] GCP Cloud SQL Socket Factory 라이브러리
+    implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.23.0'
 }
 
 tasks.named('test') {
